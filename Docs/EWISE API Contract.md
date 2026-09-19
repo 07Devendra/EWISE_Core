@@ -21,7 +21,7 @@
 | Signal | Threshold | Action if Below |
 |---|---|---|
 | `object_confidence` | 0.70 | Triggers `requires_manual_input` |
-| `weight_confidence` | 0.85 | Triggers `requires_manual_input` |
+| `weight_confidence` | 0.70 | Triggers `requires_manual_input` |
 
 ---
 
