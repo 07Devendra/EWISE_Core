@@ -189,7 +189,7 @@ contact_email          current_weight             assigned_bin_id
 - **Backend:** FastAPI
 - **Session Store:** In-memory Python dictionary with TTL (single-worker prototype)
 - **Database:** SQLite
-- **Frontend:** Sveltekit/solidJS
+- **Frontend:** HTML/CSS/JS
 - **Data Visualization:** Chart.js or Plotly.js
 
 ### 16. Frontend UI
