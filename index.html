@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus E-Waste Intelligence System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <path d="M12 8v8"/>
+                        <path d="M8 12h8"/>
+                    </svg>
+                    <h1>E-WISE</h1>
+                </div>
+                <nav class="nav">
+                    <button class="nav-btn active" data-screen="detection">Detection</button>
+                    <button class="nav-btn" data-screen="inventory">Inventory</button>
+                    <button class="nav-btn" data-screen="dashboard">Dashboard</button>
+                </nav>
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span class="status-text">System Online</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Detection Screen -->
+            <section id="detection-screen" class="screen active">
+                <div class="detection-container">
+                    <div class="camera-feed">
+                        <div class="camera-placeholder">
+                            <svg class="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                                <circle cx="12" cy="13" r="4"/>
+                            </svg>
+                            <p>Camera Feed</p>
+                        </div>
+                        <div class="detection-overlay" id="detection-overlay">
+                            <!-- Detection overlay content -->
+                        </div>
+                    </div>
+                    
+                    <div class="detection-info">
+                        <div class="system-state" id="system-state">
+                            <div class="state-indicator waiting">
+                                <span class="state-icon">⏳</span>
+                                <span class="state-text">Waiting for item...</span>
+                            </div>
+                        </div>
+
+                        <div class="detection-details" id="detection-details">
+                            <!-- Detection details will be populated dynamically -->
+                        </div>
+
+                        <div class="action-buttons" id="action-buttons">
+                            <button class="btn btn-primary" id="btn-detect">Simulate Detection</button>
+                            <button class="btn btn-secondary" id="btn-manual">Manual Input</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Inventory Screen -->
+            <section id="inventory-screen" class="screen">
+                <div class="inventory-container">
+                    <h2>Inventory Management</h2>
+                    <div class="inventory-grid" id="inventory-grid">
+                        <!-- Inventory bins will be populated dynamically -->
+                    </div>
+                    <div class="inventory-alerts" id="inventory-alerts">
+                        <!-- Logistics alerts will be populated dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dashboard Screen -->
+            <section id="dashboard-screen" class="screen">
+                <div class="dashboard-container">
+                    <h2>Analytics Dashboard</h2>
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <h3>Total E-Waste Processed</h3>
+                            <div class="metric-value" id="total-waste">0 kg</div>
+                            <div class="metric-trend positive">↑ 12% from last month</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3>Carbon Offset</h3>
+                            <div class="metric-value" id="carbon-offset">0 kg CO₂e</div>
+                            <div class="metric-trend positive">↑ 8% from last month</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3>Components Processed</h3>
+                            <div class="metric-value" id="components-count">0</div>
+                            <div class="metric-trend positive">↑ 15% from last month</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3>Active Bins</h3>
+                            <div class="metric-value" id="active-bins">0</div>
+                            <div class="metric-trend neutral">Stable</div>
+                        </div>
+                    </div>
+                    
+                    <div class="charts-container">
+                        <div class="chart-card">
+                            <h3>Material Composition</h3>
+                            <canvas id="material-chart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Monthly Trends</h3>
+                            <canvas id="trend-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Manual Input Modal -->
+        <div class="modal" id="manual-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Manual Input Required</h3>
+                    <button class="modal-close" id="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="manual-form">
+                        <div class="form-group" id="classification-group">
+                            <label for="classification">Classification</label>
+                            <select id="classification" required>
+                                <option value="">Select component type</option>
+                                <option value="PCB">PCB/Motherboard</option>
+                                <option value="RAM">RAM</option>
+                                <option value="Battery">Battery</option>
+                                <option value="HardDrive">Hard Drive/SSD</option>
+                                <option value="CoolingFan">Cooling Fan</option>
+                                <option value="Cables">Cables</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="weight-group">
+                            <label for="weight">Weight (kg)</label>
+                            <input type="number" id="weight" step="0.01" min="0" placeholder="Enter weight">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div class="toast-container" id="toast-container"></div>
+    </div>
+
+    <script src="mockData.js"></script>
+    <script src="dashboard.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
