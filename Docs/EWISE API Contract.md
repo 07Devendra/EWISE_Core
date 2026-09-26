@@ -1,25 +1,27 @@
-## EWISE: Electronic Waste Intelligence & Sorting Equipment
-**Devendra — Backend & ML Integration Lead**
+# API Contracts — Final Version (v2)
+## Campus E-Waste Intelligence System
+**Person 1 — Backend & ML Integration Lead**
+**Completed: Week 5 | Supersedes: API_Contracts_v1**
 
 ---
 
 ## System State Reference
 
-| `system_state`          | Meaning                                                                             |
-| ----------------------- | ----------------------------------------------------------------------------------- |
-| `waiting`               | System is idle, ready for next item.                                                |
-| `disassembly_required`  | Whole device detected, disassembly prompt shown to technician.                      |
+| `system_state` | Meaning |
+|---|---|
+| `waiting` | System is idle, ready for next item. |
+| `disassembly_required` | Whole device detected, disassembly prompt shown to technician. |
 | `requires_manual_input` | One or more ML confidences failed; UI dynamically renders inputs for `null` fields. |
-| `complete`              | Component routed, LCA calculated, record logged to DB.                              |
+| `complete` | Component routed, LCA calculated, record logged to DB. |
 
 ---
 
 ## Confidence Thresholds (Locked)
 
-| Signal              | Threshold | Action if Below                  |
-| ------------------- | --------- | -------------------------------- |
-| `object_confidence` | 0.70      | Triggers `requires_manual_input` |
-| `weight_confidence` | 0.70      | Triggers `requires_manual_input` |
+| Signal | Threshold | Action if Below |
+|---|---|---|
+| `object_confidence` | 0.70 | Triggers `requires_manual_input` |
+| `weight_confidence` | 0.70 | Triggers `requires_manual_input` |
 
 ---
 
@@ -64,7 +66,7 @@ pending_detections["<uuid>"] = {
 | `category` | string | `"whole_device"` or `"component"` |
 | `object_confidence` | float (0–1) | Below 0.70 → `requires_manual_input` |
 | `weight_grams` | float | Read from scale display via YOLO OCR |
-| `weight_confidence` | float (0–1) | Below 0.70 → `requires_manual_input` |
+| `weight_confidence` | float (0–1) | Below 0.85 → `requires_manual_input` |
 | `timestamp` | ISO 8601 UTC | Enables time-series trend analysis |
 
 ### Backend Decision Logic (Pseudocode)
@@ -77,7 +79,7 @@ if category == "whole_device":
     return system_state = "disassembly_required", detection_id
 
 needs_class  = object_confidence < 0.70
-needs_weight = weight_confidence < 0.70
+needs_weight = weight_confidence < 0.85
 
 if needs_class or needs_weight:
     # Preserve valid data, discard only what failed
@@ -161,7 +163,11 @@ return system_state = "complete", detection_id
     "object_confidence": 0.95
   },
   "weight": null,
-  "routing": null,
+  "routing": {
+    "bin_id": 0,
+    "bin_name": "Disassembly Holding Area",
+    "color_code": "#AAAAAA"
+  },
   "lca_metrics": null,
   "timestamp": "2026-09-19T11:36:00.123Z"
 }
@@ -172,7 +178,7 @@ return system_state = "complete", detection_id
 | State | `routing` | `lca_metrics` | `weight` |
 |---|---|---|---|
 | `complete` | populated | populated | populated |
-| `disassembly_required` | `null` | `null` | `null` |
+| `disassembly_required` | Disassembly Holding Area bin | `null` | `null` |
 | `requires_manual_input` | `null` if class missing, populated if class known | `null` | `null` if weight missing, populated if weight known |
 
 ---
@@ -270,13 +276,13 @@ return complete_payload
 
 ## Architectural Decisions (Locked)
 
-| Decision                | Value                                                                   |
-| ----------------------- | ----------------------------------------------------------------------- |
-| Whole device DB records | Not written — components only                                           |
-| Temporary store         | Plain Python dict (`pending_detections`) in FastAPI memory              |
-| TTL                     | 10 minutes — background task purges expired records                     |
-| `null` handling         | Explicit `null` in all incomplete fields (never omitted, never `{}`)    |
-| `color_code`            | Backend responsibility — sourced from Person 5's `INVENTORY_BINS` table |
-| Weight source           | YOLO OCR on scale display (interim until USB scale approved)            |
-| UI reset timer          | Person 2's responsibility — `setTimeout` on frontend, not backend       |
-| `waiting` state         | Frontend-owned idle state, not pushed by backend                        |
+| Decision | Value |
+|---|---|
+| Whole device DB records | Not written — components only |
+| Temporary store | Plain Python dict (`pending_detections`) in FastAPI memory |
+| TTL | 10 minutes — background task purges expired records |
+| `null` handling | Explicit `null` in all incomplete fields (never omitted, never `{}`) |
+| `color_code` | Backend responsibility — sourced from Person 5's `INVENTORY_BINS` table |
+| Weight source | YOLO OCR on scale display (interim until USB scale approved) |
+| UI reset timer | Person 2's responsibility — `setTimeout` on frontend, not backend |
+| `waiting` state | Frontend-owned idle state, not pushed by backend |
