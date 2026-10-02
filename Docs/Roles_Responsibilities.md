@@ -7,12 +7,13 @@ The project is divided into five distinct engineering domains to ensure technica
 **Role:** Acts as the overarching team lead and core system architect, while managing the server-side infrastructure, hardware integration, and AI deployment.
 
 **Responsibilities:**
-- Serves as the Team Lead, coordinating efforts across all engineering domains, guiding project direction, and ensuring milestones are met.
-- Architects the core system infrastructure, ensuring seamless integration between frontend, backend, database, ML, and hardware components.
 - Develops the backend web server (e.g., using FastAPI or Flask) to handle API requests and business logic.
-- Writes the hardware integration scripts to capture data from the digital scale and stream the live camera feed.
+-  Builds the camera capture pipeline and the scale-display reading module. The current standalone scale is read visually through the camera; no wired or wireless scale interface is assumed.
+- Keeps the YOLO object detector and scale-display reader as separate modules, then combines their outputs into the backend payload.
 - Integrates the trained YOLO object-detection model into the backend for real-time inference.
 - Programs the core routing logic (e.g., triggering the disassembly prompt when whole devices are detected).
+- Serves as the Team Lead, coordinating efforts across all engineering domains, guiding project direction, and ensuring milestones are met.
+- Architects the core system infrastructure, ensuring seamless integration between frontend, backend, database, ML, and hardware components.
 
 #### 2. Vedant Patil — Frontend Engineer & Product Presentation Lead
 
@@ -39,7 +40,6 @@ The project is divided into five distinct engineering domains to ensure technica
 
 **Responsibilities:**
 - Collects and curates a diverse image dataset of intact and disassembled campus e-waste.
-- Annotates images (drawing bounding boxes) and applies data augmentation techniques to simulate varied lighting and angles.
 - Trains the YOLO object-detection model and fine-tunes hyperparameters.
 - Conducts rigorous Quality Assurance (QA) testing on the model to minimize false positives and maximize detection confidence.
 
