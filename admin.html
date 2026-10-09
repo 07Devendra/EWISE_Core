@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline';">
+  <title>EWISE - Admin Dashboard</title>
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+
+<header>
+  <span class="logo">&#x267B; EWISE</span>
+  <span class="title">Admin Dashboard</span>
+  <span id="last-updated"></span>
+  <a href="/static/index.html" class="back-link">&larr; Kiosk</a>
+</header>
+
+<main>
+
+  <!-- controls -->
+  <div class="controls">
+    <label for="range-select">Period</label>
+    <select id="range-select">
+      <option value="7">7 days</option>
+      <option value="30" selected>30 days</option>
+      <option value="90">90 days</option>
+      <option value="365">365 days</option>
+    </select>
+    <button id="refresh-btn">&#x21BB; Refresh</button>
+  </div>
+
+  <!-- KPI cards -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">Carbon Avoided</div>
+      <div class="kpi-value" id="kpi-carbon">-</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">E-Waste Processed</div>
+      <div class="kpi-value" id="kpi-weight">-</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total Records</div>
+      <div class="kpi-value" id="kpi-records">-</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">This Month</div>
+      <div class="kpi-value" id="kpi-month">-</div>
+    </div>
+  </div>
+
+  <!-- charts -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>Carbon Avoided - Daily Trend</h3>
+      <canvas id="chart-trend"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>By Item Class</h3>
+      <canvas id="chart-by-class"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Materials Recovered (Carbon %)</h3>
+      <canvas id="chart-materials"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Bin Fill Levels</h3>
+      <canvas id="chart-bins"></canvas>
+    </div>
+  </div>
+
+  <!-- bins table -->
+  <div class="table-card">
+    <h3>Bin Status</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Bin</th>
+          <th>Weight</th>
+          <th>Threshold</th>
+          <th>Fill</th>
+          <th>Partner</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="bins-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- All Detections table -->
+  <div class="table-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <h3>All Detections (Individual Logs)</h3>
+      <input type="text" id="log-search" placeholder="Search records..." style="padding: 6px; border-radius: 4px; border: 1px solid var(--border);">
+    </div>
+    <div style="max-height: 400px; overflow-y: auto;">
+      <table>
+        <thead>
+          <tr>
+            <th data-sort="0" class="sortable" style="cursor:pointer; user-select:none;">Date & Time <span class="sort-icon" style="opacity:0.3; font-size:0.8em; margin-left:4px;">&#8597;</span></th>
+            <th data-sort="1" class="sortable" style="cursor:pointer; user-select:none;">Item <span class="sort-icon" style="opacity:0.3; font-size:0.8em; margin-left:4px;">&#8597;</span></th>
+            <th data-sort="2" class="sortable" style="cursor:pointer; user-select:none;">Weight <span class="sort-icon" style="opacity:0.3; font-size:0.8em; margin-left:4px;">&#8597;</span></th>
+            <th data-sort="3" class="sortable" style="cursor:pointer; user-select:none;">Dest. Bin <span class="sort-icon" style="opacity:0.3; font-size:0.8em; margin-left:4px;">&#8597;</span></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="logs-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- Edit Modal -->
+<div id="edit-modal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000;">
+  <div style="background: white; padding: 24px; border-radius: 8px; width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+    <h3 style="margin-top: 0;">Edit Record</h3>
+    <input type="hidden" id="edit-detection-id">
+    
+    <label style="display: block; margin: 12px 0 4px; font-weight: bold; color: var(--text-dark);">Item Class</label>
+    <select id="edit-item-class" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px;">
+      <option value="mobile">Mobile</option>
+      <option value="laptop">Laptop</option>
+      <option value="keyboard">Keyboard</option>
+      <option value="mouse">Mouse</option>
+      <option value="ram">RAM</option>
+      <option value="battery">Battery</option>
+      <option value="pendrive">Pendrive</option>
+    </select>
+    
+    <label style="display: block; margin: 12px 0 4px; font-weight: bold; color: var(--text-dark);">Weight (g)</label>
+    <input type="number" id="edit-weight" min="1" max="50000" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px;">
+    
+    <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
+      <button id="edit-cancel" style="padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; background: var(--bg-hover);">Cancel</button>
+      <button id="edit-save" style="padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; background: #1E88E5; color: white;">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js must be vendored  see static/vendor/README.md -->
+<script src="/static/vendor/chart.min.js"></script>
+<script src="/static/js/dashboard_charts.js"></script>
+</body>
+</html>
+
+
+
