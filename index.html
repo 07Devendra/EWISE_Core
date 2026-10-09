@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline';">
+  <title>EWISE - Kiosk</title>
+  <link rel="stylesheet" href="/static/css/kiosk.css">
+</head>
+<body>
+<div id="toast-container"></div>
+<!--  top bar  -->
+<header class="topbar">
+  <span class="logo">&#x267B; EWISE</span>
+  <span class="tagline">{Electronic Waste Intelligence & Sorting Engine}</span>
+  <a href="/static/admin.html" class="admin-link">Admin </a>
+</header>
+
+<!--  live camera feed  -->
+<section class="main-layout">
+  <div class="video-container">
+    <img id="video-feed" src="/api/video_feed" alt="Live camera feed" onerror="this.alt='Camera offline'; setTimeout(() => { this.src = '/api/video_feed?t=' + new Date().getTime(); }, 2000);">
+  </div>
+  
+  <div class="sidebar">
+    <div id="telemetry-overlay" class="telemetry-card">
+      <div class="tel-header">System Telemetry</div>
+      <div class="tel-row"><span class="tel-label">STATE</span> <span id="tel-state">IDLE</span></div>
+      <div class="tel-row"><span class="tel-label">WINNER</span> <span id="tel-winner">-</span></div>
+      <div class="tel-row"><span class="tel-label">EMPTY</span> <span id="tel-empty">1.0</span></div>
+      <div class="tel-row"><span class="tel-label">WEIGHT</span> <span id="tel-weight">-</span></div>
+    </div>
+    
+    <!--  result card (appears on detection_completed event)  -->
+    <div id="result-header-text" class="hidden" style="margin-bottom: 8px; font-weight: bold; color: var(--text-dark); text-transform: uppercase; font-size: 0.85em; letter-spacing: 1px;">Latest Detection</div>
+    <section id="result-card" class="result-card hidden" aria-live="polite">
+      <div class="result-header">
+        <span id="result-class"></span>
+      </div>
+      <div class="result-details">
+        <div class="detail-row">
+          <span class="label">Time</span>
+          <span id="result-time" class="value"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Weight</span>
+          <span id="result-weight" class="value"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Carbon avoided</span>
+          <span id="result-carbon" class="value"></span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Bin</span>
+          <span id="result-bin" class="value"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!--  bin alert banner  -->
+<section id="alert-banner" class="alert-banner hidden" aria-live="assertive">
+  <span></span>
+  <span id="alert-text"></span>
+</section>
+
+<script src="/static/js/kiosk.js"></script>
+</body>
+</html>
